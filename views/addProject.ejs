@@ -1,0 +1,53 @@
+<%- include('partials/head') %>
+<%- include('partials/navbar', { page: '/solutions/addProject' }) %>
+
+<div class="max-w-4xl mx-auto px-4 py-6">
+  <h1 class="text-3xl font-bold mb-6 text-center">Add Project</h1>
+
+  <form method="POST" action="/solutions/addProject" class="space-y-4">
+    <div>
+      <label class="block font-semibold">Title</label>
+      <input name="title" type="text" class="input input-bordered w-full" required />
+    </div>
+
+    <div>
+      <label class="block font-semibold">Feature Image URL</label>
+      <input name="feature_img_url" type="url" class="input input-bordered w-full" required />
+    </div>
+
+    <div>
+      <label class="block font-semibold">Sector</label>
+      <select name="sector_id" class="select select-bordered w-full" required>
+        <% sectors.forEach(sector => { %>
+          <option value="<%= sector.id %>"><%= sector.sector_name %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div>
+      <label class="block font-semibold">Intro (Short)</label>
+      <textarea name="intro_short" class="textarea textarea-bordered w-full" required></textarea>
+    </div>
+
+    <div>
+      <label class="block font-semibold">Summary (Short)</label>
+      <textarea name="summary_short" class="textarea textarea-bordered w-full" required></textarea>
+    </div>
+
+    <div>
+      <label class="block font-semibold">Impact</label>
+      <textarea name="impact" class="textarea textarea-bordered w-full" required></textarea>
+    </div>
+
+    <div>
+      <label class="block font-semibold">Original Source URL</label>
+      <input name="original_source_url" type="url" class="input input-bordered w-full" required />
+    </div>
+
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+  </form>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,63 +1,69 @@
-const projectData = require("../data/projectData");
-const sectorData = require("../data/sectorData");
+require('dotenv').config();
+require('pg');
+const Sequelize = require('sequelize');
 
-let projects = [];
+const { sequelize, Sector, Project } = require("../models/project");
+
 
 const initialize = () => {
-    return new Promise((resolve, reject) => {
-        try {
-            projects = [];
-            projectData.forEach(proj => {
-                const sector = sectorData.find(sec => sec.id === proj.sector_id);
-                projects.push({
-                    ...proj,
-                    sector: sector ? sector.sector_name : "Unknown"
-                });
-            });
-            resolve();
-        } catch (err) {
-            reject("Initialization failed: " + err);
-        }
-    });
+  return sequelize.sync()
+    .then(() => Promise.resolve())
+    .catch((err) => Promise.reject("Unable to sync the database: " + err));
 };
+
 
 const getAllProjects = () => {
-    return new Promise((resolve, reject) => {
-        if (projects.length > 0) {
-            resolve(projects);
-        } else {
-            reject("No projects found.");
-        }
-    });
+  return Project.findAll({ include: [Sector] })
+    .then(projects => projects.map(p => p.get({ plain: true })))
+    .catch(() => Promise.reject("No projects found."));
 };
 
-const getProjectById = (projectId) => {
-    return new Promise((resolve, reject) => {
-        const found = projects.find(p => p.id === projectId);
-        if (found) {
-            resolve(found);
-        } else {
-            reject("Project not found.");
-        }
-    });
+const getProjectById = (id) => {
+  return Project.findAll({
+    include: [Sector],
+    where: { id: id }
+  })
+    .then(projects => {
+      if (projects.length > 0) return projects[0].get({ plain: true });
+      else throw new Error("Unable to find requested project");
+    })
+    .catch(() => Promise.reject("Unable to find requested project"));
 };
 
 const getProjectsBySector = (sector) => {
-    return new Promise((resolve, reject) => {
-        const matched = projects.filter(p => 
-            p.sector.toLowerCase().includes(sector.toLowerCase())
-        );
-        if (matched.length > 0) {
-            resolve(matched);
-        } else {
-            reject("No projects found for the given sector.");
-        }
-    });
+  return Project.findAll({
+    include: [Sector],
+    where: {
+      '$Sector.sector_name$': {
+        [Sequelize.Op.iLike]: `%${sector}%`
+      }
+    }
+  })
+    .then(projects => {
+      if (projects.length > 0) {
+        return projects.map(p => p.get({ plain: true }));
+      } else {
+        throw new Error("Unable to find requested projects");
+      }
+    })
+    .catch(() => Promise.reject("Unable to find requested projects"));
 };
 
-module.exports = {
-    initialize,
-    getAllProjects,
-    getProjectById,
-    getProjectsBySector
+const addProject = (projectData) => {
+  return Project.create(projectData);
 };
+
+const getAllSectors = () => {
+  return Sector.findAll({ raw: true });
+};
+
+
+module.exports = {
+  initialize,
+  getAllProjects,
+  getProjectById,
+  getProjectsBySector,
+  getAllSectors,
+  addProject
+};
+
