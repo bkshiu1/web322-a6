@@ -8,7 +8,7 @@
 * 
 *  Name: Karl Shiu  Student ID: 131531246  Date: 18/7/2025 
 *
-*  Published URL: https://web322assingment-4.onrender.com
+*  Published URL: https://web322-a5-nbwk.onrender.com
 *
 ********************************************************************************/
     /*Due to issues installing Tailwind via npm scripts, the styles were built using the direct CLI command
@@ -146,15 +146,5 @@ app.use((req, res) => {
   });
 });
 
-// Initialize and optionally listen (for local)
-projectData.initialize().then(() => {
-  if (!process.env.VERCEL) {
-    app.listen(HTTP_PORT, () => {
-      console.log(`Server listening on port ${HTTP_PORT}`);
-    });
-  }
-}).catch(err => {
-  console.error("Failed to initialize project data:", err);
-});
 
 module.exports = app;
