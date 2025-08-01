@@ -36,3 +36,31 @@ const Project = sequelize.define('Project', {
 Project.belongsTo(Sector, { foreignKey: 'sector_id' });
 
 module.exports = { sequelize, Sector, Project };
+
+// Add this near the bottom of projects.js
+
+async function getAllSectors() {
+  try {
+    const sectors = await Sector.findAll();
+    return sectors;
+  } catch (err) {
+    throw new Error("Unable to fetch sectors");
+  }
+}
+
+async function addProject(projectData) {
+  try {
+    await Project.create(projectData);
+  } catch (err) {
+    throw new Error(err.errors[0].message);
+  }
+}
+
+module.exports = {
+  sequelize,
+  Sector,
+  Project,
+  getAllSectors,
+  addProject
+};
+

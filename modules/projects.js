@@ -57,6 +57,52 @@ const getAllSectors = () => {
   return Sector.findAll({ raw: true });
 };
 
+function editProject(id, projectData) {
+  return Project.update(projectData, {
+    where: { id: id }
+  }).then(() => {
+    return;
+  }).catch(err => {
+    return Promise.reject(err.errors[0].message);
+  });
+}
+
+async function editProject(data) {
+  try {
+    const project = await Project.findByPk(data.id);
+    if (!project) throw new Error("Project not found");
+
+    await project.update(data);
+    return Promise.resolve();
+  } catch (err) {
+    return Promise.reject(err.message);
+  }
+}
+
+function updateProject(id, data) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const result = await Project.update(data, {
+        where: { id: id }
+      });
+      resolve();
+    } catch (err) {
+      reject(err.errors ? err.errors[0].message : err.message);
+    }
+  });
+}
+
+function deleteProject(id) {
+  return new Promise((resolve, reject) => {
+    Project.destroy({
+      where: { id }
+    })
+      .then(() => resolve())
+      .catch(err => reject(err.errors ? err.errors[0].message : err));
+  });
+}
+
+module.exports.editProject = editProject;
 
 module.exports = {
   initialize,
@@ -64,6 +110,9 @@ module.exports = {
   getProjectById,
   getProjectsBySector,
   getAllSectors,
-  addProject
+  addProject,
+  editProject,
+  updateProject,
+  deleteProject
 };
 
