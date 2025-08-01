@@ -23,56 +23,48 @@ const HTTP_PORT = process.env.PORT || 8080;
 const projectData = require("./modules/projects");
 const { deleteProject } = require("./modules/projects");
 
-
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, "views"));
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-projectData.initialize().then(() => {
-
-  app.get("/", (req, res) => {
-    res.render("home", { page: "/" });
-  });
-
-  app.get("/about", (req, res) => {
-    res.render("about", { page: "/about" });
-  });
-
-  app.get("/solutions/projects", (req, res) => {
-    const sector = req.query.sector;
-
-    const fetch = sector
-      ? projectData.getProjectsBySector(sector)
-      : projectData.getAllProjects();
-
-    fetch
-      .then(data => {
-        res.render("projects", {
-          page: "/solutions/projects",
-          data
-        });
-      })
-      .catch(err => {
-        res.status(404).render("404", {
-          page: "/solutions/projects",
-          message: "No projects found."
-        });
-      });
-  });
-
-  
-app.get("/solutions/projects/:id", (req, res) => {
-  const id = parseInt(req.params.id);
-
-  projectData.getProjectById(id)
-    .then(project => {
-res.render("project", {
-  page: "/solutions/projects",
-  data: project
+// Routes
+app.get("/", (req, res) => {
+  res.render("home", { page: "/" });
 });
 
+app.get("/about", (req, res) => {
+  res.render("about", { page: "/about" });
+});
+
+app.get("/solutions/projects", (req, res) => {
+  const sector = req.query.sector;
+
+  const fetch = sector
+    ? projectData.getProjectsBySector(sector)
+    : projectData.getAllProjects();
+
+  fetch
+    .then(data => {
+      res.render("projects", { page: "/solutions/projects", data });
+    })
+    .catch(err => {
+      res.status(404).render("404", {
+        page: "/solutions/projects",
+        message: "No projects found."
+      });
+    });
+});
+
+app.get("/solutions/projects/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  projectData.getProjectById(id)
+    .then(project => {
+      res.render("project", {
+        page: "/solutions/projects",
+        data: project
+      });
     })
     .catch(err => {
       res.status(404).render("404", {
@@ -109,7 +101,9 @@ app.get("/solutions/editProject/:id", async (req, res) => {
     const sectors = await projectData.getAllSectors();
     res.render("editProject", { project, sectors });
   } catch (err) {
-    res.status(500).render("500", { message: `Error loading project for edit: ${err}` });
+    res.status(500).render("500", {
+      message: `Error loading project for edit: ${err}`
+    });
   }
 });
 
@@ -118,7 +112,9 @@ app.post("/solutions/editProject", async (req, res) => {
     await projectData.editProject(req.body);
     res.redirect("/solutions/projects");
   } catch (err) {
-    res.status(500).render("500", { message: `Error saving edited project: ${err}` });
+    res.status(500).render("500", {
+      message: `Error saving edited project: ${err}`
+    });
   }
 });
 
@@ -127,7 +123,9 @@ app.post("/solutions/editProject/:id", async (req, res) => {
     await projectData.updateProject(req.params.id, req.body);
     res.redirect("/solutions/projects");
   } catch (err) {
-    res.render("500", { message: `Sorry, there was an error: ${err}` });
+    res.render("500", {
+      message: `Sorry, there was an error: ${err}`
+    });
   }
 });
 
@@ -141,21 +139,22 @@ app.get("/solutions/deleteProject/:id", (req, res) => {
     );
 });
 
-
-
-  app.use((req, res) => {
-    res.status(404).render("404", {
-      page: "",
-      message: "Sorry, the page you're looking for doesn't exist."
-    });
+app.use((req, res) => {
+  res.status(404).render("404", {
+    page: "",
+    message: "Sorry, the page you're looking for doesn't exist."
   });
+});
 
-//  app.listen(HTTP_PORT, () => {
-//    console.log(`Server listening on port ${HTTP_PORT}`);
-//  });
-
+// Initialize and optionally listen (for local)
+projectData.initialize().then(() => {
+  if (!process.env.VERCEL) {
+    app.listen(HTTP_PORT, () => {
+      console.log(`Server listening on port ${HTTP_PORT}`);
+    });
+  }
 }).catch(err => {
-  console.error("Failed to start server:", err);
+  console.error("Failed to initialize project data:", err);
 });
 
 module.exports = app;
