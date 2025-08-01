@@ -150,10 +150,12 @@ app.get("/solutions/deleteProject/:id", (req, res) => {
     });
   });
 
-  app.listen(HTTP_PORT, () => {
-    console.log(`Server listening on port ${HTTP_PORT}`);
-  });
+//  app.listen(HTTP_PORT, () => {
+//    console.log(`Server listening on port ${HTTP_PORT}`);
+//  });
 
 }).catch(err => {
   console.error("Failed to start server:", err);
 });
+
+module.exports = app;
