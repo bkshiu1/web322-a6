@@ -37,7 +37,9 @@
 
         <div class="flex flex-col gap-2 mt-6">
           <a href="#" onclick="history.back(); return false;" class="btn btn-outline">← Back</a>
-          <a href="/solutions/editProject/<%= data.id %>" class="btn btn-success">Edit</a>
+          <% if (session.user) { %>
+            <a href="/solutions/editProject/<%= data.id %>" class="btn btn-success">Edit</a>
+          <% } %>
         </div>
       </div>
     </div>

@@ -1,0 +1,55 @@
+<%- include('partials/header', { title: 'Register', page: '/Register', session: session }) %>
+
+
+<section class="min-h-screen bg-base-200 px-4 py-10">
+  <div class="max-w-2xl mx-auto">
+    <div class="bg-base-300 rounded-box p-10">
+      <% if (successMessage) { %>
+        <div class="alert alert-success mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span><%= successMessage %></span>
+        </div>
+        <a href="/login" class="btn btn-success">Proceed to Log in</a>
+      <% } else { %>
+        <h1 class="text-4xl font-bold text-center text-base-content mb-2">Register</h1>
+        <p class="text-center text-base-content/70 mb-6">Please provide your credentials below</p>
+        <form method="POST" action="/register">
+          <label class="form-control w-full mb-4">
+            <div class="label"><span class="label-text">User Name</span></div>
+            <input name="userName" class="input input-bordered w-full" type="text" required value="<%= typeof userName !== 'undefined' ? userName : '' %>">
+          </label>
+          <label class="form-control w-full mb-4">
+            <div class="label"><span class="label-text">Password</span></div>
+            <input name="password" class="input input-bordered w-full" type="password" required>
+          </label>
+          <label class="form-control w-full mb-4">
+            <div class="label"><span class="label-text">Confirm Password</span></div>
+            <input name="password2" class="input input-bordered w-full" type="password" required>
+          </label>
+          <label class="form-control w-full mb-6">
+            <div class="label"><span class="label-text">Email Address</span></div>
+            <input name="email" class="input input-bordered w-full" type="email" required>
+          </label>
+          <button class="btn btn-success">Register</button>
+
+          <% if (errorMessage) { %>
+            <div class="alert alert-error mt-6">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+                   viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span><%= errorMessage %></span>
+            </div>
+          <% } %>
+        </form>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title><%= title %></title>
+
+  <!-- ✅ Correct Tailwind + DaisyUI setup via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {},
+      },
+      plugins: [tailwindcssDaisyui],
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/daisyui"></script>
+
+  <!-- ✅ Optional custom CSS -->
+  <link href="/css/main.css" rel="stylesheet" />
+</head>
+
+<body class="bg-base-200 text-base-content">
+  <nav class="navbar bg-base-300 px-4 shadow-md">
+    <div class="flex-1">
+      <a class="btn btn-ghost text-lg font-bold" href="/">Climate Solutions</a>
+    </div>
+    <div class="flex-none">
+      <ul class="menu menu-horizontal px-1">
+        <li><a class="<%= page === '/' ? 'active' : '' %>" href="/">Home</a></li>
+        <li><a class="<%= page === '/about' ? 'active' : '' %>" href="/about">About</a></li>
+        <li><a class="<%= page === '/solutions/projects' ? 'active' : '' %>" href="/solutions/projects">View Projects</a></li>
+        <% if (!session.user) { %>
+          <li>
+            <details>
+              <summary class="hover:bg-base-100 rounded-md">Account</summary>
+              <ul class="p-2 bg-base-100">
+                <li><a class="<%= page === '/login' ? 'active' : '' %>" href="/login">Login</a></li>
+                <li><a class="<%= page === '/register' ? 'active' : '' %>" href="/register">Register</a></li>
+              </ul>
+            </details>
+          </li>
+        <% } else { %>
+          <li>
+            <details>
+              <summary class="hover:bg-base-100 rounded-md">Account: <%= session.user.userName %></summary>
+              <ul class="p-2 bg-base-100">
+                <li><a class="<%= page === '/userHistory' ? 'active' : '' %>" href="/userHistory">User History</a></li>
+                <li><a href="/logout">Logout</a></li>
+              </ul>
+            </details>
+          </li>
+        <% } %>
+      </ul>
+    </div>
+  </nav>
