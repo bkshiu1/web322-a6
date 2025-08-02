@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const Schema = mongoose.Schema;
-let User; // to be defined on new connection (see initialize)
+let User; // Defined after DB connection
 
 const userSchema = new Schema({
   userName: {
@@ -14,7 +14,7 @@ const userSchema = new Schema({
   email: String,
   loginHistory: [
     {
-      dateTime: Date,
+      dateTime: String,
       userAgent: String
     }
   ]
@@ -22,7 +22,12 @@ const userSchema = new Schema({
 
 module.exports.initialize = function () {
   return new Promise((resolve, reject) => {
-    let db = mongoose.createConnection(process.env.MONGODB);
+    mongoose.connect(process.env.MONGODB, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+
+    const db = mongoose.connection;
 
     db.on('error', (err) => reject(err));
     db.once('open', () => {
@@ -65,13 +70,11 @@ module.exports.registerUser = function (userData) {
 
 module.exports.checkUser = function (userData) {
   return new Promise((resolve, reject) => {
-    User.find({ userName: userData.userName })
-      .then((users) => {
-        if (users.length === 0) {
+    User.findOne({ userName: userData.userName })
+      .then((user) => {
+        if (!user) {
           return reject("Unable to find user: " + userData.userName);
         }
-
-        const user = users[0];
 
         bcrypt.compare(userData.password, user.password)
           .then((isMatch) => {
@@ -79,8 +82,8 @@ module.exports.checkUser = function (userData) {
               return reject("Incorrect Password for user: " + userData.userName);
             }
 
-            // Update login history
-            if (user.loginHistory.length === 8) {
+            // Limit loginHistory to 8
+            if (user.loginHistory.length >= 8) {
               user.loginHistory.pop();
             }
 
@@ -97,8 +100,6 @@ module.exports.checkUser = function (userData) {
           })
           .catch(() => reject("Error comparing passwords"));
       })
-      .catch(() => {
-        reject("Unable to find user: " + userData.userName);
-      });
+      .catch(() => reject("Unable to find user: " + userData.userName));
   });
 };
